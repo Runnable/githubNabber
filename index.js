@@ -1,14 +1,16 @@
+#!/usr/bin/env node
 var tar = require('tar');
 var zlib = require('zlib');
 var Docker = require('dockerode');
 var request = require('request');
 var archiver = require('archiver');
 var fs = require('fs');
+var parse = require('./gitUrl');
 
 var archive = archiver.create('tar');
 var docker = new Docker({host: 'http://172.16.42.43', port: 4243});
 
-request('https://github.com/Runnable/dockworker/archive/master.tar.gz')
+request(parse(process.argv[2]))
   .pipe(zlib.createGunzip())
   .pipe(tar.Parse())
   .on('entry', function (entry) {
@@ -25,13 +27,7 @@ request('https://github.com/Runnable/dockworker/archive/master.tar.gz')
       'ADD ./src /root\n' +
       'RUN cd /root && npm install\n' +
       'CMD npm start', { name: 'Dockerfile' });
-    archive.finalize(function (err, bytes) {
-      console.log('DONE', bytes);
-    });
-
-    archive
-      .pipe(zlib.createGzip())
-      .pipe(fs.createWriteStream(__dirname + '/out.tar.gz'));
+    archive.finalize();
 
     archive
       .pipe(request.post({
@@ -41,11 +37,16 @@ request('https://github.com/Runnable/dockworker/archive/master.tar.gz')
         }
       }))
       .on('data', function (raw) {
-        var data = JSON.parse(raw);
-        if (data.stream) {
-          process.stdout.write(data.stream);
-        } else {
-          console.log(data);
+        try {
+          var data = JSON.parse(raw);
+          if (data.stream) {
+            process.stdout.write(data.stream);
+          } else {
+            console.log(data);
+          }
+        } catch (err) {
+          console.log('RAW', raw);
+          console.error(err);
         }
       });
   });

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js https://github.com/wookimiii/leveldb-with-react"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "tar": "~0.1.19",
     "dockerode": "~1.2.5",
     "request": "~2.33.0",
-    "archiver": "~0.5.2"
+    "archiver": "~0.5.2",
+    "github-url": "~1.1.0"
   }
 }
