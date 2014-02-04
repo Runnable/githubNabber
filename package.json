@@ -11,9 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "tar": "~0.1.19",
-    "dockerode": "~1.2.5",
     "request": "~2.33.0",
-    "archiver": "~0.5.2",
-    "github-url": "~1.1.0"
+    "archiver": "~0.5.2"
   }
 }

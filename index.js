@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 var tar = require('tar');
 var zlib = require('zlib');
-var Docker = require('dockerode');
 var request = require('request');
 var archiver = require('archiver');
 var fs = require('fs');
 var parse = require('./gitUrl');
 
 var archive = archiver.create('tar');
-var docker = new Docker({host: 'http://172.16.42.43', port: 4243});
 
 request(parse(process.argv[2]))
   .pipe(zlib.createGunzip())
@@ -45,8 +43,7 @@ request(parse(process.argv[2]))
             console.log(data);
           }
         } catch (err) {
-          console.log('RAW', raw);
-          console.error(err);
+          console.log(raw.toString());
         }
       });
   });
