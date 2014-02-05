@@ -1,0 +1,4 @@
+FROM runnable/lamp
+WORKDIR /var/www
+ADD ./src /var/www
+CMD date

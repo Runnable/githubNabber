@@ -1,0 +1,4 @@
+FROM runnable/web
+WORKDIR /var/www
+ADD ./src /var/www
+CMD date
