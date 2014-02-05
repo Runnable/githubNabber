@@ -7,24 +7,26 @@ var fs = require('fs');
 var parse = require('./gitUrl');
 
 var archive = archiver.create('tar');
+var successfull = /^Successfully built/;
+var rootDir = /[^\/]*/;
+var succeeded = false;
 
 request(parse(process.argv[2]))
   .pipe(zlib.createGunzip())
   .pipe(tar.Parse())
   .on('entry', function (entry) {
-
     archive.append(entry, {
-      name: entry.props.path.replace(/[^\/]*/,'src'),
+      name: entry.props.path.replace(rootDir, 'src'),
       date: entry.props.mtime,
       mode: entry.props.mode
     });
   })
   .on('end', function () {
-    archive.append('FROM runnable/node\n' +
-      'WORKDIR /root\n' +
-      'ADD ./src /root\n' +
-      'RUN cd /root && npm install\n' +
-      'CMD npm start', { name: 'Dockerfile' });
+    archive.append(fs.createReadStream(__dirname +
+      '/dockerfiles/' +
+      process.argv[3]), {
+      name: 'Dockerfile' 
+    });
     archive.finalize();
 
     archive
@@ -38,6 +40,9 @@ request(parse(process.argv[2]))
         try {
           var data = JSON.parse(raw);
           if (data.stream) {
+            if (successfull.test(data.stream)) {
+              succeeded = true;
+            }
             process.stdout.write(data.stream);
           } else {
             console.log(data);
@@ -45,5 +50,8 @@ request(parse(process.argv[2]))
         } catch (err) {
           console.log(raw.toString());
         }
+      })
+      .on('end', function () {
+        console.log('Succeeded', succeeded);
       });
   });
