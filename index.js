@@ -5,7 +5,7 @@ var fs = require('fs');
 var parse = require('./gitUrl');
 var createDomain = require('domain').create;
 
-var successfull = /^Successfully built/;
+var successfull = /Successfully built/;
 var rootDir = /[^\/]*/;
 
 
@@ -56,13 +56,12 @@ module.exports = function (options, cb) {
           if (data.stream && successfull.test(data.stream)) {
             succeeded = true;
           }
-        } catch (err) {
-          if (successfull.test(raw)) {
-            succeeded = true;
-          }
+        } catch (err) {}
+        if (successfull.test(raw.toString())) {
+          succeeded = true;
         }
       })
-      .on('end', function () {
+      .on('end', function (data) {
         if (succeeded) {
           cb();
         } else {
