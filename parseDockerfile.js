@@ -16,4 +16,4 @@ module.exports = function (file) {
     cmd: cmd,
     workdir: workdir
   };
-},
+};
