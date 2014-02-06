@@ -3,6 +3,7 @@ var zlib = require('zlib');
 var request = require('request');
 var fs = require('fs');
 var parse = require('./gitUrl');
+var parseDockerfile = require('./parseDockerfile');
 var createDomain = require('domain').create;
 
 var successfull = /Successfully built/;
@@ -18,11 +19,13 @@ module.exports = function (options, cb) {
     var extract = tar.extract();
     var pack = tar.pack();
     var succeeded = false;
+    var response;
 
     fs.readFile(__dirname +
       '/dockerfiles/' +
       options.stack,
       domain.intercept(function (file) {
+        response = parseDockerfile(file);
         pack.entry({ name: 'Dockerfile' }, file);
       }));
 
@@ -63,7 +66,7 @@ module.exports = function (options, cb) {
       })
       .on('end', function (data) {
         if (succeeded) {
-          cb();
+          cb(null, response);
         } else {
           cb(new Error('Failed to build'));
         }
