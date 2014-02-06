@@ -56,7 +56,11 @@ module.exports = function (options, cb) {
           if (data.stream && successfull.test(data.stream)) {
             succeeded = true;
           }
-        } catch (err) {}
+        } catch (err) {
+          if (successfull.test(raw)) {
+            succeeded = true;
+          }
+        }
       })
       .on('end', function () {
         if (succeeded) {
