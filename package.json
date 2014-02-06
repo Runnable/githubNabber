@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js https://github.com/wookimiii/leveldb-with-react node"
+    "start": "node index.js https://github.com/Runnable/dockworker node"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tar": "~0.1.19",
     "request": "~2.33.0",
-    "archiver": "~0.5.2"
+    "npm": "~1.3.26",
+    "tar-stream": "~0.2.5",
+    "install": "~0.1.7"
   }
 }

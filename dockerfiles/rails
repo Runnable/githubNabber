@@ -1,5 +1,5 @@
 FROM runnable/rails
 WORKDIR /root
 ADD ./src /root
-RUN rails c
+RUN cd /root && rails c
 CMD rails server -p 80
