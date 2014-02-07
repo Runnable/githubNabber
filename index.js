@@ -59,7 +59,18 @@ module.exports = function (options, cb) {
           if (data.stream && successfull.test(data.stream)) {
             succeeded = true;
           }
-        } catch (err) {}
+          if (options.verbose) {
+            if (data.stream) {
+              process.stdout.write(data.stream);
+            } else {
+              console.log(data);
+            }
+          }
+        } catch (err) {
+          if (optinos.verbose) {
+            console.log(raw);
+          }
+        }
         if (successfull.test(raw.toString())) {
           succeeded = true;
         }
