@@ -67,14 +67,15 @@ module.exports = function (options, cb) {
             }
           }
         } catch (err) {
-          if (optinos.verbose) {
-            console.log(raw);
+          if (options.verbose) {
+            console.log(raw.toString());
           }
         }
         if (successfull.test(raw.toString())) {
           succeeded = true;
         }
       })
+      
       .on('end', function (data) {
         if (succeeded) {
           cb(null, response);
