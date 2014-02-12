@@ -2,3 +2,4 @@ FROM runnable/python
 WORKDIR /root
 ADD ./src /root
 CMD python app.py
+ENV RUNNABLE_SERVICE_CMDS memcached -d -u www-data; mysqld

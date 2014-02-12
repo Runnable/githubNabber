@@ -3,3 +3,4 @@ WORKDIR /root
 ADD ./src /root
 RUN cd /root && rails c
 CMD rails server -p 80
+ENV RUNNABLE_SERVICE_CMDS rm -rf /var/www/app/tmp/pids/server.pid; mysqld;
