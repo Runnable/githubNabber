@@ -5,6 +5,7 @@ var fs = require('fs');
 var parse = require('./gitUrl');
 var parseDockerfile = require('./parseDockerfile');
 var createDomain = require('domain').create;
+var Docker = require('dockerode');
 
 var successfull = /Successfully built/;
 var rootDir = /[^\/]*/;
@@ -16,6 +17,7 @@ module.exports = function (options, cb) {
   domain.on('error', cb);
 
   domain.run(function () {
+    var docker = new Docker({host: options.host, port: options.port});
     var extract = tar.extract();
     var pack = tar.pack();
     var succeeded = false;
@@ -32,7 +34,7 @@ module.exports = function (options, cb) {
     extract
       .on('entry', function (header, stream, callback) {
         header.name = header.name.replace(rootDir, 'src');
-        if (header.type === 'directory') {
+        if (header.type !== 'file') {
           callback();
         } else {
           stream.pipe(pack.entry(header, callback));
@@ -46,42 +48,43 @@ module.exports = function (options, cb) {
       .pipe(zlib.createGunzip())
       .pipe(extract);
 
-    pack
-      .pipe(request.post({
-        url: options.destination,
-        headers: {
-          "Content-type": "application/tar"
-        }
-      }))
-      .on('data', function (raw) {
-        try {
-          var data = JSON.parse(raw);
-          if (data.stream && successfull.test(data.stream)) {
-            succeeded = true;
-          }
-          if (options.verbose) {
-            if (data.stream) {
-              process.stdout.write(data.stream);
-            } else {
-              console.log(data);
+    docker.buildImage(pack, options.query, function (err, res) {
+      if (err) {
+        cb(err);
+      } else {
+        res
+          .on('data', function (raw) {
+            try {
+              var data = JSON.parse(raw);
+              if (data.stream && successfull.test(data.stream)) {
+                succeeded = true;
+              }
+              if (options.verbose) {
+                if (data.stream) {
+                  process.stdout.write(data.stream);
+                } else {
+                  console.log(data);
+                }
+              }
+            } catch (err) {
+              if (options.verbose) {
+                console.log(raw.toString());
+              }
             }
-          }
-        } catch (err) {
-          if (options.verbose) {
-            console.log(raw.toString());
-          }
-        }
-        if (successfull.test(raw.toString())) {
-          succeeded = true;
-        }
-      })
-      
-      .on('end', function (data) {
-        if (succeeded) {
-          cb(null, response);
-        } else {
-          cb(new Error('Failed to build'));
-        }
-      });
+            if (successfull.test(raw.toString())) {
+              succeeded = true;
+            }
+          })
+          
+          .on('end', function (data) {
+            if (succeeded) {
+              cb(null, response);
+            } else {
+              cb(new Error('Failed to build'));
+            }
+          });
+      }
+    });
+
   });
 };
