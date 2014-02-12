@@ -15,6 +15,7 @@
     "tar-stream": "~0.2.5",
     "install": "~0.1.7",
     "dockerode": "~1.2.5",
-    "express": "~3.4.8"
+    "express": "~3.4.8",
+    "concat-stream": "~1.4.1"
   }
 }

@@ -12,12 +12,13 @@ new Proxy(4243, function () {
       },
       stack: 'node',
       verbose: true
-    }, function (err) {
+    }, function (err, response) {
       if (err) {
         console.error(err.stack);
       } else {
-        console.log('success');
+        console.log('success', response);
       }
+      process.exit();
     });
   });
 });

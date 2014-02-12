@@ -4,11 +4,13 @@ var request = require('request');
 var fs = require('fs');
 var parse = require('./gitUrl');
 var parseDockerfile = require('./parseDockerfile');
+var concat = require('concat-stream');
 var createDomain = require('domain').create;
 var Docker = require('dockerode');
 
 var successfull = /Successfully built/;
 var rootDir = /[^\/]*/;
+var isReadme = /^src\/([Rr][Ee][Aa][Dd][Mm][Ee]\.?.+?)$/;
 
 
 module.exports = function (options, cb) {
@@ -22,6 +24,7 @@ module.exports = function (options, cb) {
     var pack = tar.pack();
     var succeeded = false;
     var response;
+    var readme;
 
     fs.readFile(__dirname +
       '/dockerfiles/' +
@@ -37,6 +40,14 @@ module.exports = function (options, cb) {
         if (header.type !== 'file') {
           callback();
         } else {
+          if (isReadme.test(header.name)) {
+            stream.pipe(concat(function (contents) {
+              readme = {
+                name: isReadme.exec(header.name)[1],
+                contents: contents.toString()
+              }
+            }));
+          }
           stream.pipe(pack.entry(header, callback));
         }
       })
@@ -78,6 +89,7 @@ module.exports = function (options, cb) {
           
           .on('end', function (data) {
             if (succeeded) {
+              response.readme = readme;
               cb(null, response);
             } else {
               cb(new Error('Failed to build'));
