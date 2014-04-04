@@ -46,7 +46,7 @@ module.exports = function (options, cb) {
               readme = {
                 name: isReadme.exec(header.name)[1],
                 contents: contents.toString()
-              }
+              };
             }));
           }
           stream.pipe(pack.entry(header, callback));
