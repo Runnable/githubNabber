@@ -31,24 +31,27 @@ module.exports = function (options, cb) {
       options.stack,
       domain.intercept(function (file) {
         response = parseDockerfile(file);
-        pack.entry({ name: 'Dockerfile' }, file);
+        pack.entry({ name: './Dockerfile' }, file);
       }));
 
     extract
       .on('entry', function (header, stream, callback) {
-        header.name = header.name.replace(rootDir, 'src');
-        if (header.type !== 'file') {
+        header.name = header.name.replace(rootDir, './src');
+        if (header.type === 'directory') {
+          pack.entry(header);
           callback();
-        } else {
+        } else if (header.type === 'file') {
           if (isReadme.test(header.name)) {
             stream.pipe(concat(function (contents) {
               readme = {
                 name: isReadme.exec(header.name)[1],
                 contents: contents.toString()
-              }
+              };
             }));
           }
           stream.pipe(pack.entry(header, callback));
+        } else {
+          callback();
         }
       })
       .on('finish', function () {
