@@ -12,7 +12,7 @@ module.exports = function (file) {
 
 function parseCmd (file) {
   var cmd = CMD.exec(file);
-  if (cmd == null) {
+  if (cmd === null) {
     throw Error('Dockerfile needs CMD');
   }
   cmd = cmd.pop();
@@ -24,7 +24,7 @@ function parseCmd (file) {
 
 function parseWorkdir (file) {
   var workdir = WORKDIR.exec(file);
-  if (workdir == null) {
+  if (workdir === null) {
    throw Error('Dockerfile needs WORKDIR');
   }
   return workdir.pop();
@@ -32,7 +32,7 @@ function parseWorkdir (file) {
 
 function parseServices (file) {
   var services = RUNNABLE_SERVICE_CMDS.exec(file);
-  if (services == null) {
+  if (services === null) {
    throw Error('Dockerfile needs RUNNABLE_SERVICE_CMDS');
   }
   return services.pop();
