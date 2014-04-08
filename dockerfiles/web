@@ -1,5 +1,0 @@
-FROM runnable/web
-WORKDIR /var/www
-ADD ./src /var/www
-CMD date
-ENV RUNNABLE_SERVICE_CMDS /etc/init.d/apache2 restart
