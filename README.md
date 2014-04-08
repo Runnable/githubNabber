@@ -22,7 +22,7 @@ var options = {
 };
 var nab = nabber(options);
 nab.createDockerImage(function (err, readme) {
-  if (err) return done(err);
+  if (err) console.log(err);
   /* nab.imageId is the Docker image ID that was created
    * the image is also tagged with 'nabber/test', so you 
    * can do docker.getImage('nabber/test') to get the 
