@@ -4,7 +4,8 @@
   "description": "Building Docker images from Github",
   "main": "lib/index.js",
   "scripts": {
-    "test": "NODE_PATH=./lib mocha --reporter spec"
+    "test": "NODE_ENV=testing NODE_PATH=./lib mocha --reporter spec",
+    "docker-test": "TEST_USING_DOCKER=true NODE_ENV=testing NODE_PATH=./lib mocha --reporter spec"
   },
   "author": "",
   "license": "MIT",
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "should": "~3.3.0",
-    "mocha": "~1.18.2"
+    "mocha": "~1.18.2",
+    "express": "~3.4.8",
+    "tar": "~0.1.19"
   }
 }

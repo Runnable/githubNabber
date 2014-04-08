@@ -2,13 +2,24 @@ var should = require('should');
 var nabber = require('index');
 var Docker = require('dockerode');
 
-var dockerOptions = {
-  host: 'http://localhost',
-  port: 4243
-};
+/* defaults to using a docker mock, but it can test using docker setting:
+ * DOCKER_HOST and TEST_USING_DOCKER
+ */
+var dockerOptions = {};
+dockerOptions.host = 'http://localhost';
+dockerOptions.port = 5253;
+
+if (process.env.DOCKER_HOST && process.env.TEST_USING_DOCKER) {
+  console.log('using REAL Docker!');
+  var url = require('url');
+  var u = url.parse(process.env.DOCKER_HOST);
+  dockerOptions.host = 'http://' + u.host;
+  dockerOptions.port = u.port || 4243;
+}
 
 var options = {
   source: 'http://github.com/Runnable/githubNabber',
+  docker: dockerOptions,
   dockerBuildOptions: {
     't': 'nabber/test',
     'nocache': true,
@@ -78,8 +89,10 @@ describe('building Dockerfiles', function () {
 
 describe('building docker images', function () {
   afterEach(function (done) {
-    Docker(dockerOptions).getImage('nabber/test').remove(function (err, res) {
-      done();
+    Docker(dockerOptions).getImage('nabber/test').remove(function (err) {
+      if (!err) done();
+      else if (err && err.statusCode === 409) done();
+      else done();
     });
   });
   this.timeout(10000);
