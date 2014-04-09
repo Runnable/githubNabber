@@ -1,6 +1,6 @@
 {
   "name": "githubNabber",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "Building Docker images from Github",
   "main": "lib/index.js",
   "scripts": {
@@ -21,7 +21,11 @@
       "threshold": 90
     }
   },
-  "author": "",
+  "author": "Bryan Kendall <bryan@bryankendall.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Runnable/githubNabber"
+  },
   "license": "MIT",
   "dependencies": {
     "request": "~2.33.0",
