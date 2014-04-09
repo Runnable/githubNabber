@@ -1,13 +1,16 @@
 var should = require('should');
 var nabber = require('index');
 var Docker = require('dockerode');
+var debug = require('util').debug;
+var dockerMock = require('docker-mock');
+dockerMock.listen(5354);
 
 /* defaults to using a docker mock, but it can test using docker setting:
  * DOCKER_HOST and TEST_USING_DOCKER
  */
 var dockerOptions = {};
 dockerOptions.host = 'http://localhost';
-dockerOptions.port = 5253;
+dockerOptions.port = 5354;
 
 if (process.env.DOCKER_HOST && process.env.TEST_USING_DOCKER) {
   console.log('using REAL Docker!');
@@ -43,11 +46,30 @@ describe('url functions', function () {
       });
     });
     describe('for https url with git', function () {
-      options.source = 'http://github.com/Runnable/githubNabber.git';
-      var nab = nabber(options);
+      var nab = nabber({
+        source: 'http://github.com/Runnable/githubNabber.git',
+        docker: dockerOptions,
+        dockerBuildOptions: {
+          't': 'nabber/test',
+          'nocache': true,
+        },
+      });
       it('should give us the url for the archive tarball', function () {
         nab.getUrl().should.equal(targetUrl);
       });
+    });
+  });
+  describe('for unknown urls', function () {
+    var nab = nabber({
+      source: 'http://foo.com/bar.tar.gz',
+      docker: dockerOptions,
+      dockerBuildOptions: {
+        't': 'nabber/test',
+        'nocache': true,
+      },
+    });
+    it('should return back the same url', function () {
+      nab.getUrl().should.equal('http://foo.com/bar.tar.gz');
     });
   });
 });
@@ -92,7 +114,7 @@ describe('building docker images', function () {
     Docker(dockerOptions).getImage('nabber/test').remove(function (err) {
       if (!err) done();
       else if (err && err.statusCode === 409) done();
-      else done();
+      else done(err);
     });
   });
   this.timeout(10000);

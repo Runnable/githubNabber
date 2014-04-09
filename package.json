@@ -4,8 +4,22 @@
   "description": "Building Docker images from Github",
   "main": "lib/index.js",
   "scripts": {
-    "test": "NODE_ENV=testing NODE_PATH=./lib mocha --reporter spec",
-    "docker-test": "TEST_USING_DOCKER=true NODE_ENV=testing NODE_PATH=./lib mocha --reporter spec"
+    "test": "NODE_ENV=testing NODE_PATH=./lib mocha --bail --reporter spec",
+    "docker-test": "TEST_USING_DOCKER=true NODE_ENV=testing NODE_PATH=./lib mocha --bail --reporter spec",
+    "coverage": "NODE_ENV=testing NODE_PATH=./lib mocha --bail --require blanket --reporter html-cov > coverage.html",
+    "coverage-docker": "TEST_USING_DOCKER=true NODE_ENV=testing NODE_PATH=./lib mocha --bail --require blanket --reporter html-cov > coverage.html",
+    "travis": "NODE_ENV=testing NODE_PATH=./lib mocha --bail --require blanket --reporter travis-cov",
+    "test-all": "npm test && npm run docker-test",
+    "coverage-all": "npm run coverage && npm run coverage-docker && npm run travis"
+  },
+  "config": {
+    "blanket": {
+      "pattern": "lib",
+      "data-cover-never": "node_modules"
+    },
+    "travis-cov": {
+      "threshold": 90
+    }
   },
   "author": "",
   "license": "MIT",
@@ -19,9 +33,12 @@
     "concat-stream": "~1.4.1"
   },
   "devDependencies": {
-    "should": "~3.3.0",
-    "mocha": "~1.18.2",
+    "docker-mock": "git://github.com/Runnable/docker-mock#develop",
     "express": "~3.4.8",
-    "tar": "~0.1.19"
+    "mocha": "^1.18.2",
+    "should": "~3.3.0",
+    "tar": "~0.1.19",
+    "blanket": "~1.1.6",
+    "travis-cov": "~0.2.5"
   }
 }
