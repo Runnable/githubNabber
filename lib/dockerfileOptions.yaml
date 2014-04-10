@@ -1,0 +1,19 @@
+---
+stacks:
+  - web
+lines:
+  - FROM
+  - WORKDIR
+  - ADD
+  - CMD
+  - ENV
+FROM:
+  web: runnable/web
+WORKDIR:
+  web: /var/www
+ADD:
+  web: /var/www
+CMD:
+  web: date
+ENV:
+  web: RUNNABLE_SERVICE_CMDS memcached -d -u www-data; mysqld;

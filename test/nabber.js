@@ -97,7 +97,6 @@ describe('downloading tarballs', function () {
       });
       extract.on('finish', function () {
         fileNames.indexOf('./src/').should.not.equal(-1);
-        // FIXME: we _do_ need a dockerfile...
         fileNames.indexOf('./Dockerfile').should.not.equal(-1);
         nab.readme.should.not.be.undefined;
         done();

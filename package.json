@@ -34,7 +34,8 @@
     "install": "~0.1.7",
     "dockerode": "~1.2.5",
     "express": "~3.4.8",
-    "concat-stream": "~1.4.1"
+    "concat-stream": "~1.4.1",
+    "yaml-js": "0.0.8"
   },
   "devDependencies": {
     "express": "~3.4.8",
