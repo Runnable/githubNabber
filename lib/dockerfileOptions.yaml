@@ -12,7 +12,7 @@ FROM:
 WORKDIR:
   web: /var/www
 ADD:
-  web: /var/www
+  web: ./src /var/www
 CMD:
   web: date
 ENV:
