@@ -1,5 +1,8 @@
 var should = require('should');
 var nabber = require('index');
+var nock = require('nock');
+var fs = require('fs');
+var join = require('path').join;
 var Docker = require('dockerode');
 var debug = require('util').debug;
 var dockerMock = require('docker-mock');
@@ -11,6 +14,14 @@ dockerMock.listen(5354);
 var dockerOptions = {};
 dockerOptions.host = 'http://localhost';
 dockerOptions.port = 5354;
+
+// catch the github downloads and supply a sample tarball!
+var github = nock('https://github.com').
+  persist(). // remove this, and put this in-line of the tests we if need different tarballs
+  get('/Runnable/githubNabber/archive/master.tar.gz').
+  reply(200, function (uri, reqBody) {
+    return fs.createReadStream(join(__dirname, 'fixtures/githubNabber.tar.gz'));
+  });
 
 if (process.env.DOCKER_HOST && process.env.TEST_USING_DOCKER) {
   console.log('using REAL Docker!');
@@ -47,7 +58,7 @@ describe('url functions', function () {
     });
     describe('for https url with git', function () {
       var nab = nabber({
-        source: 'http://github.com/Runnable/githubNabber.git',
+        source: 'https://github.com/Runnable/githubNabber.git',
         docker: dockerOptions,
         dockerBuildOptions: {
           't': 'nabber/test',
@@ -61,7 +72,7 @@ describe('url functions', function () {
   });
   describe('for unknown urls', function () {
     var nab = nabber({
-      source: 'http://foo.com/bar.tar.gz',
+      source: 'https://foo.com/bar.tar.gz',
       docker: dockerOptions,
       dockerBuildOptions: {
         't': 'nabber/test',
@@ -69,13 +80,12 @@ describe('url functions', function () {
       },
     });
     it('should return back the same url', function () {
-      nab.getUrl().should.equal('http://foo.com/bar.tar.gz');
+      nab.getUrl().should.equal('https://foo.com/bar.tar.gz');
     });
   });
 });
 
 describe('downloading tarballs', function () {
-  this.timeout(10000); // we don't want to have a download timeout
   describe('from github', function () {
     var nab = nabber(options);
     it('should give us a tarball with some source files and a Dockerfile', function (done) {
@@ -117,7 +127,6 @@ describe('building docker images', function () {
       else done(err);
     });
   });
-  this.timeout(10000);
   describe('of github tarballs', function () {
     options.docker = dockerOptions;
     var nab = nabber(options);
