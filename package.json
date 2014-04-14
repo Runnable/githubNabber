@@ -1,6 +1,6 @@
 {
   "name": "githubNabber",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "build docker containers from github repositories",
   "main": "index.js",
   "scripts": {
